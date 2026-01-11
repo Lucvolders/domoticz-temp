@@ -7,7 +7,7 @@
     <!-- PWA / Mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#121212">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/domotic-temp/manifest.json">
 
     <!-- Google Charts -->
     <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -166,9 +166,7 @@
         }
 
         // Service worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
+ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/domoticz-temp/sw.js'); }
     </script>
 </head>
 
