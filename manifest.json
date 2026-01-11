@@ -1,7 +1,7 @@
 {
   "name": "Domoticz Temperature",
   "short_name": "Temperature",
-  "start_url": "/domoticz-temp/",
+  "start_url": "/domoticz-temp/index.html",
   "scope": "/domoticz-temp/",
   "display": "standalone",
   "background_color": "#121212",
