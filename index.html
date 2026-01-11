@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Temperature Dashboard</title>
+
+    <!-- PWA / Mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#121212">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Google Charts -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #ffffff;
+            --subtext: #b0b0b0;
+            --accent: #1e88e5;
+        }
+
+        body.light {
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --text: #000000;
+            --subtext: #555;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 420px;
+            padding: 16px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .toggle {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        #gauge {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .value {
+            font-size: 2.4rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .timestamp {
+            color: var(--subtext);
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: bold;
+            color: white;
+            background: var(--accent);
+            border: none;
+            border-radius: 14px;
+            margin-top: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
+
+    <script>
+        let chart, data, options;
+        let dark = true;
+
+        google.charts.load('current', { packages: ['gauge'] });
+        google.charts.setOnLoadCallback(initGauge);
+
+        function initGauge() {
+            data = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['Temp °C', 0]
+            ]);
+
+            options = {
+                min: 0,
+                max: 50,
+                width: 300,
+                height: 300,
+                blueFrom: 0,
+                blueTo: 15,
+                yellowFrom: 15,
+                yellowTo: 25,
+                redFrom: 25,
+                redTo: 50,
+                minorTicks: 5
+            };
+
+            chart = new google.visualization.Gauge(
+                document.getElementById('gauge')
+            );
+
+            chart.draw(data, options);
+            getTemperature();
+            setInterval(getTemperature, 300000); // auto refresh
+        }
+
+        function getTemperature() {
+            fetch("http://192.168.178.134:8080/json.htm?type=command&param=getdevices&rid=23799")
+                .then(r => r.json())
+                .then(j => {
+                    if (j.result?.length) {
+                        const t = j.result[0].Temp;
+                        data.setValue(0, 1, t);
+                        chart.draw(data, options);
+                        document.getElementById("value").innerText = t + " °C";
+                        document.getElementById("time").innerText =
+                            "Updated: " + new Date().toLocaleTimeString();
+                    }
+                });
+        }
+
+        function toggleTheme() {
+            dark = !dark;
+            document.body.classList.toggle("light", !dark);
+        }
+
+        // Service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="dashboard">
+    <div class="card">
+
+        <div class="header">
+            <div class="title">🌡 Temperature</div>
+            <button class="toggle" onclick="toggleTheme()">🌓</button>
+        </div>
+
+        <div id="gauge"></div>
+
+        <div class="value" id="value">-- °C</div>
+        <div class="timestamp" id="time">Waiting for update…</div>
+
+        <button onclick="getTemperature()">Refresh</button>
+
+    </div>
+</div>
+
+</body>
+</html>

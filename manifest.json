@@ -1,0 +1,22 @@
+{
+  "name": "Domoticz Temperature",
+  "short_name": "Temperature",
+  "start_url": "/domoticz-temp/",
+  "scope": "/domoticz-temp/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "description": "A simple PWA temperature dashboard using Domoticz.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
